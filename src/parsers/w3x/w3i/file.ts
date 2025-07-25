@@ -44,6 +44,9 @@ export default class War3MapW3i {
   waterVertexColor = new Uint8Array(4);
   scriptMode = 0;
   graphicsMode = 0;
+  defaultCameraZoom: number = 0;
+  maxCameraZoom: number = 0;
+  minCameraZoom: number = 0;
   players: Player[] = [];
   forces: Force[] = [];
   upgradeAvailabilityChanges: UpgradeAvailabilityChange[] = [];
@@ -109,6 +112,12 @@ export default class War3MapW3i {
     if (this.version > 30) {
       this.graphicsMode = stream.readUint32();
       this.unknown1 = stream.readUint32();
+    }
+
+    if (this.version > 32) {
+      this.defaultCameraZoom = stream.readUint32();
+      this.maxCameraZoom = stream.readUint32();
+      this.minCameraZoom = stream.readUint32();
     }
 
     for (let i = 0, l = stream.readInt32(); i < l; i++) {
@@ -219,6 +228,12 @@ export default class War3MapW3i {
     if (this.version > 30) {
       stream.writeUint32(this.graphicsMode);
       stream.writeUint32(this.unknown1);
+    }
+
+    if (this.version > 32) {
+      stream.writeUint32(this.defaultCameraZoom);
+      stream.writeUint32(this.maxCameraZoom);
+      stream.writeUint32(this.minCameraZoom);
     }
 
     stream.writeUint32(this.players.length);
