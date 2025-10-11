@@ -42,7 +42,7 @@ export default class War3MapW3e {
       for (let column = 0, columns = this.mapSize[0]; column < columns; column++) {
         const corner = new Corner();
 
-        corner.load(stream);
+        corner.load(stream, this.version);
 
         this.corners[row][column] = corner;
       }
@@ -74,7 +74,7 @@ export default class War3MapW3e {
 
     for (const row of this.corners) {
       for (const corner of row) {
-        corner.save(stream);
+        corner.save(stream, this.version);
       }
     }
 
@@ -82,6 +82,7 @@ export default class War3MapW3e {
   }
 
   getByteLength(): number {
-    return 37 + (this.groundTilesets.length * 4) + (this.cliffTilesets.length * 4) + (this.mapSize[0] * this.mapSize[1] * 7);
+    const bytesPerCorner = this.version >= 12 ? 8 : 7;
+    return 37 + (this.groundTilesets.length * 4) + (this.cliffTilesets.length * 4) + (this.mapSize[0] * this.mapSize[1] * bytesPerCorner);
   }
 }
