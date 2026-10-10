@@ -14,11 +14,17 @@ export default class Player {
   allyLowPriorities = 0;
   allyHighPriorities = 0;
   unknown1 = new Uint8Array(8);
+  hudSkin = 0;
 
   load(stream: BinaryStream, version: number): void {
     this.id = stream.readInt32();
     this.type = stream.readInt32();
     this.race = stream.readInt32();
+
+    if (version >= 39) {
+      this.hudSkin = stream.readInt32();
+    }
+
     this.isFixedStartPosition = stream.readInt32();
     this.name = stream.readNull();
     stream.readFloat32Array(this.startLocation);
@@ -33,6 +39,11 @@ export default class Player {
     stream.writeInt32(this.id);
     stream.writeInt32(this.type);
     stream.writeInt32(this.race);
+
+    if (version >= 39) {
+      stream.writeInt32(this.hudSkin);
+    }
+
     stream.writeInt32(this.isFixedStartPosition);
     stream.writeNull(this.name);
     stream.writeFloat32Array(this.startLocation);
@@ -48,6 +59,10 @@ export default class Player {
 
     if (version > 30) {
       size += 8;
+    }
+
+    if (version >= 39) {
+      size += 4;
     }
 
     return size;

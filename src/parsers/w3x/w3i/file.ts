@@ -55,6 +55,11 @@ export default class War3MapW3i {
   randomItemTables: RandomItemTable[] = [];
   unknown1 = 0;
 
+  // Added in format version 39 (Warcraft III 3.0).
+  unknown2 = 0;
+  unknown3 = new Uint8Array(24);
+  unknown4 = new Uint8Array(40);
+
   load(buffer: ArrayBuffer | Uint8Array): void {
     const stream = new BinaryStream(buffer);
 
@@ -76,6 +81,10 @@ export default class War3MapW3i {
     this.flags = stream.readUint32();
     this.tileset = stream.readBinary(1);
     this.campaignBackground = stream.readInt32();
+
+    if (this.version >= 39) {
+      this.unknown2 = stream.readInt32();
+    }
 
     if (this.version > 24) {
       this.loadingScreenModel = stream.readNull();
@@ -102,6 +111,11 @@ export default class War3MapW3i {
       this.globalWeather = stream.readInt32();
       this.soundEnvironment = stream.readNull();
       this.lightEnvironmentTileset = stream.readBinary(1);
+
+      if (this.version >= 39) {
+        stream.readUint8Array(this.unknown3);
+      }
+
       stream.readUint8Array(this.waterVertexColor);
     }
 
@@ -118,6 +132,10 @@ export default class War3MapW3i {
       this.defaultCameraZoom = stream.readUint32();
       this.maxCameraZoom = stream.readUint32();
       this.minCameraZoom = stream.readUint32();
+    }
+
+    if (this.version >= 39) {
+      stream.readUint8Array(this.unknown4);
     }
 
     for (let i = 0, l = stream.readInt32(); i < l; i++) {
@@ -193,6 +211,10 @@ export default class War3MapW3i {
     stream.writeBinary(this.tileset);
     stream.writeInt32(this.campaignBackground);
 
+    if (this.version >= 39) {
+      stream.writeInt32(this.unknown2);
+    }
+
     if (this.version > 24) {
       stream.writeNull(this.loadingScreenModel);
     }
@@ -218,6 +240,11 @@ export default class War3MapW3i {
       stream.writeInt32(this.globalWeather);
       stream.writeNull(this.soundEnvironment);
       stream.writeBinary(this.lightEnvironmentTileset);
+
+      if (this.version >= 39) {
+        stream.writeUint8Array(this.unknown3);
+      }
+
       stream.writeUint8Array(this.waterVertexColor);
     }
 
@@ -234,6 +261,10 @@ export default class War3MapW3i {
       stream.writeUint32(this.defaultCameraZoom);
       stream.writeUint32(this.maxCameraZoom);
       stream.writeUint32(this.minCameraZoom);
+    }
+
+    if (this.version >= 39) {
+      stream.writeUint8Array(this.unknown4);
     }
 
     stream.writeUint32(this.players.length);
@@ -314,6 +345,10 @@ export default class War3MapW3i {
 
     if (this.version > 32) {
       size += 12;
+    }
+
+    if (this.version >= 39) {
+      size += 68; // unknown2 (4) + unknown3 (24) + unknown4 (40)
     }
 
     return size;
